@@ -165,8 +165,8 @@ public class UserService {
     
     private Map<String, Long> getUserCategories() {
         Map<String, Long> categories = new HashMap<>();
-        categories.put("FARMER", userRepository.findByRole(User.UserRole.FARMER).size());
-        categories.put("RETAILER", userRepository.findByRole(User.UserRole.RETAILER).size());
+        categories.put("FARMER", (long) userRepository.findByRole(User.UserRole.FARMER).size());
+        categories.put("RETAILER", (long) userRepository.findByRole(User.UserRole.RETAILER).size());
         return categories;
     }
     

@@ -14,16 +14,21 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
         message.setSubject("Agri-Pulse - Registration Approved");
-        message.setText(String.format(
-            "Dear User,\n\n" +
-            "Your registration has been approved!\n\n" +
-            "Login Credentials:\n" +
-            "Username: %s\n" +
-            "Temporary Password: %s\n\n" +
-            "Please login and reset your password immediately.\n\n" +
-            "Best Regards,\n" +
-            "Agri-Pulse Team",
-            username, tempPassword
+        message.setText((
+                """
+                Dear User,
+                
+                Your registration has been approved!
+                
+                Login Credentials:
+                Username: %s
+                Temporary Password: %s
+                
+                Please login and reset your password immediately.
+                
+                Best Regards,
+                Agri-Pulse Team""").formatted(
+                username, tempPassword
         ));
         mailSender.send(message);
     }
