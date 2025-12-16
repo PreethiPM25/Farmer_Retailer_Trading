@@ -6,7 +6,10 @@ import RegistrationPage from './pages/RegistrationPage';
 import AdminDashboard from './pages/AdminDashboard';
 import FarmerDashboard from './pages/FarmerDashboard';
 import RetailerDashboard from './pages/RetailerDashboard';
-import ResetPassword from './pages/ResetPassword';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import EmailInboxPage from './pages/EmailInboxPage';
+import EmailInboxSimulator from './pages/EmailInboxSimulator';
 
 function App() {
   return (
@@ -15,10 +18,13 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegistrationPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/farmer/dashboard" element={<FarmerDashboard />} />
         <Route path="/retailer/dashboard" element={<RetailerDashboard />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/new-password" element={<ResetPasswordPage />} />
+        <Route path="/inbox" element={<EmailInboxPage />} />
+        <Route path="/gmail-inbox" element={<EmailInboxSimulator />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>

@@ -13,6 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     List<User> findByStatus(User.UserStatus status);
     List<User> findByRole(User.UserRole role);
+    List<User> findByPasswordResetStatus(User.PasswordResetStatus status);
     
     @Query("SELECT COUNT(u) FROM User u WHERE u.role != 'ADMIN'")
     long countNonAdminUsers();

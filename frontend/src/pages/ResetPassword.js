@@ -7,12 +7,8 @@ function ResetPassword() {
   const location = useLocation();
   const email = location.state?.email || JSON.parse(localStorage.getItem('user'))?.email;
   
-  const [formData, setFormData] = useState({
-    email: email,
-    oldPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -21,46 +17,46 @@ function ResetPassword() {
     setError('');
     setSuccess('');
     
-    if (formData.newPassword !== formData.confirmPassword) {
+    if (newPassword !== confirmPassword) {
       setError('Passwords do not match');
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      setError('Password must be at least 6 characters');
       return;
     }
     
     try {
       const response = await authAPI.resetPassword({
-        email: formData.email,
-        oldPassword: formData.oldPassword,
-        newPassword: formData.newPassword
+        email: email,
+        newPassword: newPassword
       });
-      setSuccess(response.data.message);
-      setTimeout(() => navigate('/login'), 2000);
+      setSuccess('Password reset successfully! Redirecting to login...');
+      setTimeout(() => {
+        localStorage.removeItem('user');
+        navigate('/login');
+      }, 3000);
     } catch (err) {
-      setError(err.response?.data?.message || 'Password reset failed');
+      setError('Password reset failed. Please try again.');
     }
   };
 
   return (
     <div className="auth-page">
       <div className="auth-container">
-        <h2>Reset Password</h2>
+        <h2>Reset Your Password</h2>
+        <p style={{textAlign: 'center', color: '#666', marginBottom: '20px'}}>Enter your new password below</p>
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Old Password</label>
-            <input
-              type="password"
-              value={formData.oldPassword}
-              onChange={(e) => setFormData({...formData, oldPassword: e.target.value})}
-              required
-            />
-          </div>
-          <div className="form-group">
             <label>New Password</label>
             <input
               type="password"
-              value={formData.newPassword}
-              onChange={(e) => setFormData({...formData, newPassword: e.target.value})}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Enter new password"
               required
             />
           </div>
@@ -68,8 +64,9 @@ function ResetPassword() {
             <label>Confirm New Password</label>
             <input
               type="password"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Re-enter new password"
               required
             />
           </div>

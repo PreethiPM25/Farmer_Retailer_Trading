@@ -12,21 +12,16 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String email;
     
-    @Column(nullable = false)
     private String password;
-    
-    @Column(nullable = false)
     private String fullName;
-    
     private String phone;
     private String address;
     private String documentPath;
     
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private UserRole role;
     
     @Enumerated(EnumType.STRING)
@@ -38,11 +33,21 @@ public class User {
     private LocalDateTime lastLogin;
     private LocalDateTime approvalDate;
     
+    private String passwordResetToken;
+    private LocalDateTime passwordResetRequestDate;
+    
+    @Enumerated(EnumType.STRING)
+    private PasswordResetStatus passwordResetStatus = PasswordResetStatus.NONE;
+    
     public enum UserRole {
         ADMIN, FARMER, RETAILER
     }
     
     public enum UserStatus {
         PENDING, APPROVED, REJECTED, ACTIVE, INACTIVE
+    }
+    
+    public enum PasswordResetStatus {
+        NONE, REQUESTED, APPROVED_BY_ADMIN, COMPLETED
     }
 }
