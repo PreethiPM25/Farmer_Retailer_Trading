@@ -1,0 +1,121 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║                    FORGOT PASSWORD - COMPLETE FLOW                         ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+    USER                          SYSTEM                         ADMIN
+    ════                          ══════                         ═════
+
+     │                                                              │
+     │  1. Go to /forgot-password                                  │
+     ├──────────────────────────►                                  │
+     │                                                              │
+     │  2. Enter email                                              │
+     │     preeths.252005@gmail.com                                │
+     ├──────────────────────────►                                  │
+     │                                                              │
+     │                           3. Create password                │
+     │                              reset request                  │
+     │                              Status: REQUESTED              │
+     │                                  │                          │
+     │                                  │                          │
+     │  4. "Request sent to admin"      │                          │
+     │◄──────────────────────────       │                          │
+     │                                  │                          │
+     │                                  │  5. Show in dashboard    │
+     │                                  ├─────────────────────────►│
+     │                                  │                          │
+     │                                  │  6. Admin sees request   │
+     │                                  │     in "Password Reset   │
+     │                                  │     Requests" section    │
+     │                                  │                          │
+     │                                  │  7. Admin clicks         │
+     │                                  │     "Approve & Send      │
+     │                                  │     Temp Password"       │
+     │                                  │◄─────────────────────────┤
+     │                                  │                          │
+     │                           8. Generate temp password         │
+     │                              Tempabcd1234                   │
+     │                              Update user password           │
+     │                              Set passwordReset=false        │
+     │                                  │                          │
+     │  9. Email sent                   │                          │
+     │     "Temp Password: Tempabcd1234"│                          │
+     │◄──────────────────────────       │                          │
+     │                                  │                          │
+     │                                  │  10. Success message     │
+     │                                  ├─────────────────────────►│
+     │                                  │      "Approved!"         │
+     │                                                              │
+     │  11. Go to /login                                            │
+     ├──────────────────────────►                                  │
+     │                                                              │
+     │  12. Enter credentials                                       │
+     │      Email: preeths.252005@gmail.com                        │
+     │      Password: Tempabcd1234                                 │
+     ├──────────────────────────►                                  │
+     │                                                              │
+     │                           13. Verify credentials            │
+     │                               Check passwordReset=false     │
+     │                                  │                          │
+     │  14. Redirect to /reset-password │                          │
+     │◄──────────────────────────       │                          │
+     │                                  │                          │
+     │  15. Enter new password                                      │
+     │      New: MyNewPass123                                       │
+     │      Confirm: MyNewPass123                                   │
+     ├──────────────────────────►                                  │
+     │                                                              │
+     │                           16. Update password               │
+     │                               Set passwordReset=true        │
+     │                               Set status=ACTIVE             │
+     │                                  │                          │
+     │  17. "Password reset successfully!"                          │
+     │◄──────────────────────────       │                          │
+     │                                  │                          │
+     │  18. Redirect to /login          │                          │
+     │◄──────────────────────────       │                          │
+     │                                  │                          │
+     │  19. Login with new password                                 │
+     │      Email: preeths.252005@gmail.com                        │
+     │      Password: MyNewPass123                                 │
+     ├──────────────────────────►                                  │
+     │                                                              │
+     │                           20. Verify credentials            │
+     │                               Check passwordReset=true      │
+     │                                  │                          │
+     │  21. Redirect to dashboard       │                          │
+     │      /farmer/dashboard           │                          │
+     │◄──────────────────────────       │                          │
+     │                                  │                          │
+     │  22. ✅ SUCCESS!                 │                          │
+     │      User is now active          │                          │
+     │      and can use system          │                          │
+     │                                  │                          │
+     ▼                                  ▼                          ▼
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║                         KEY POINTS                                         ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+✓ User requests password reset
+✓ Request goes to admin dashboard
+✓ Admin approves and temp password is generated
+✓ Email sent to user with temp password
+✓ User logs in with temp password
+✓ System forces password reset (passwordReset=false)
+✓ User sets new password
+✓ User becomes ACTIVE (passwordReset=true)
+✓ User can login with new password
+✓ User accesses their dashboard
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║                    ALL WORKING - NO BUGS! 🎉                               ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝

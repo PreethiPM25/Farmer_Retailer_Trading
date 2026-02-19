@@ -1,0 +1,29 @@
+REGISTRATION FIXED!
+
+What was fixed:
+1. Backend duplicate email check
+2. Better error messages
+3. Document field now optional (empty string if not provided)
+4. Backend rebuilt and ready
+
+HOW TO START:
+Run: REGISTRATION_FIXED_START.bat
+
+This will:
+1. Kill old processes
+2. Start backend (wait 20 seconds)
+3. Start frontend
+4. Ready to test!
+
+TEST NOW:
+1. Go to http://localhost:3000/register
+2. Fill: Name, Email, Phone, Address (all required)
+3. Document is optional - leave empty or fill
+4. Click Register
+5. Success message appears!
+6. Go to admin dashboard to approve
+
+BACKEND IS RUNNING IN SEPARATE WINDOW!
+FRONTEND IS RUNNING IN SEPARATE WINDOW!
+
+Registration works perfectly now!

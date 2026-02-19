@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Registration</title>
+</head>
+<body>
+    <h1>Test User Registration</h1>
+    <button onclick="registerTestUser()">Register Test Farmer</button>
+    <button onclick="checkPending()">Check Pending Users</button>
+    <button onclick="approveFirst()">Approve First Pending User</button>
+    <pre id="result"></pre>
+
+    <script>
+        const API = 'http://localhost:8080/api';
+        
+        async function registerTestUser() {
+            try {
+                const response = await fetch(`${API}/auth/register`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        email: 'testfarmer' + Date.now() + '@test.com',
+                        fullName: 'Test Farmer User',
+                        phone: '1234567890',
+                        address: 'Test Farm Address',
+                        role: 'FARMER',
+                        documentPath: 'test-doc.pdf'
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                document.getElementById('result').textContent = 'Error: ' + err.message;
+            }
+        }
+        
+        async function checkPending() {
+            try {
+                const response = await fetch(`${API}/admin/pending-users`);
+                const data = await response.json();
+                document.getElementById('result').textContent = 'Pending Users:\n' + JSON.stringify(data, null, 2);
+            } catch (err) {
+                document.getElementById('result').textContent = 'Error: ' + err.message;
+            }
+        }
+        
+        async function approveFirst() {
+            try {
+                const response = await fetch(`${API}/admin/pending-users`);
+                const users = await response.json();
+                if (users.length > 0) {
+                    const approveRes = await fetch(`${API}/admin/approve/${users[0].id}`, {
+                        method: 'POST'
+                    });
+                    const data = await approveRes.json();
+                    document.getElementById('result').textContent = 'Approval Result:\n' + JSON.stringify(data, null, 2);
+                } else {
+                    document.getElementById('result').textContent = 'No pending users to approve';
+                }
+            } catch (err) {
+                document.getElementById('result').textContent = 'Error: ' + err.message;
+            }
+        }
+    </script>
+</body>
+</html>
