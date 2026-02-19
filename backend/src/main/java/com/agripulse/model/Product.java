@@ -21,10 +21,18 @@ public class Product {
     @Column(nullable = false)
     private String unit = "kg";
     
-    @Column(nullable = false)
-    private Double price;
+    @Column(nullable = false, name = "base_price")
+    private Double basePrice;
+    
+    @Column(name = "min_bid_price")
+    private Double minBidPrice;
+    
+    @Column(name = "highest_bid")
+    private Double highestBid = 0.0;
     
     @Column(nullable = false)
+    private String status = "Active";
+    
     private String availability = "Available";
     
     private String location;
@@ -47,6 +55,15 @@ public class Product {
     @Column(name = "bid_end_date")
     private LocalDateTime bidEndDate;
     
+    @Column(name = "harvest_date")
+    private LocalDateTime harvestDate;
+    
+    @Column(name = "delivery_area")
+    private String deliveryArea;
+    
+    @Column(name = "is_paused")
+    private Boolean isPaused = false;
+    
     @PrePersist
     protected void onCreate() {
         if (createdDate == null) {
@@ -58,6 +75,9 @@ public class Product {
         if (availability == null) {
             availability = "Available";
         }
+        if (status == null) {
+            status = "Active";
+        }
         if (deliveryDays == null) {
             deliveryDays = 7;
         }
@@ -66,6 +86,12 @@ public class Product {
         }
         if (bidEndDate == null && bidTimeframeDays != null) {
             bidEndDate = LocalDateTime.now().plusDays(bidTimeframeDays);
+        }
+        if (highestBid == null) {
+            highestBid = 0.0;
+        }
+        if (isPaused == null) {
+            isPaused = false;
         }
     }
     
@@ -86,8 +112,17 @@ public class Product {
     public String getUnit() { return unit; }
     public void setUnit(String unit) { this.unit = unit; }
     
-    public Double getPrice() { return price; }
-    public void setPrice(Double price) { this.price = price; }
+    public Double getBasePrice() { return basePrice; }
+    public void setBasePrice(Double basePrice) { this.basePrice = basePrice; }
+    
+    public Double getMinBidPrice() { return minBidPrice; }
+    public void setMinBidPrice(Double minBidPrice) { this.minBidPrice = minBidPrice; }
+    
+    public Double getHighestBid() { return highestBid; }
+    public void setHighestBid(Double highestBid) { this.highestBid = highestBid; }
+    
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
     
     public String getAvailability() { return availability; }
     public void setAvailability(String availability) { this.availability = availability; }
@@ -115,4 +150,13 @@ public class Product {
     
     public LocalDateTime getBidEndDate() { return bidEndDate; }
     public void setBidEndDate(LocalDateTime bidEndDate) { this.bidEndDate = bidEndDate; }
+    
+    public LocalDateTime getHarvestDate() { return harvestDate; }
+    public void setHarvestDate(LocalDateTime harvestDate) { this.harvestDate = harvestDate; }
+    
+    public String getDeliveryArea() { return deliveryArea; }
+    public void setDeliveryArea(String deliveryArea) { this.deliveryArea = deliveryArea; }
+    
+    public Boolean getIsPaused() { return isPaused; }
+    public void setIsPaused(Boolean isPaused) { this.isPaused = isPaused; }
 }

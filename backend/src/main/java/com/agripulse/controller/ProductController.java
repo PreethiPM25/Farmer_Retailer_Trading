@@ -26,87 +26,70 @@ public class ProductController {
     private EmailService emailService;
     
     @PostMapping
-    public ResponseEntity<?> addProduct(@RequestBody Product product) {
+    public ResponseEntity<?> addProduct(@RequestBody Map<String, Object> productData) {
         try {
             System.out.println("=== ADDING PRODUCT ===");
-            System.out.println("Product data received: " + product.getName());
-            System.out.println("Farmer email: " + product.getFarmerEmail());
-            System.out.println("Quantity: " + product.getQuantity());
-            System.out.println("Price: " + product.getPrice());
-            System.out.println("Location: " + product.getLocation());
+            System.out.println("Raw data: " + productData);
+            
+            Product product = new Product();
+            product.setName((String) productData.get("name"));
+            product.setCategory((String) productData.get("category"));
+            product.setFarmerEmail((String) productData.get("farmerEmail"));
+            product.setDeliveryArea((String) productData.get("deliveryArea"));
+            product.setImagePath((String) productData.get("imagePath"));
+            
+            if (productData.get("quantity") != null) {
+                product.setQuantity(Double.valueOf(productData.get("quantity").toString()));
+            }
+            if (productData.get("basePrice") != null) {
+                product.setBasePrice(Double.valueOf(productData.get("basePrice").toString()));
+            }
+            if (productData.get("minBidPrice") != null && !productData.get("minBidPrice").toString().isEmpty()) {
+                product.setMinBidPrice(Double.valueOf(productData.get("minBidPrice").toString()));
+            }
             
             // Validate required fields
             if (product.getName() == null || product.getName().trim().isEmpty()) {
-                System.err.println("ERROR: Product name is required");
                 return ResponseEntity.badRequest().body(Map.of("error", "Product name is required"));
             }
             if (product.getFarmerEmail() == null || product.getFarmerEmail().trim().isEmpty()) {
-                System.err.println("ERROR: Farmer email is required");
                 return ResponseEntity.badRequest().body(Map.of("error", "Farmer email is required"));
             }
             if (product.getQuantity() == null || product.getQuantity() <= 0) {
-                System.err.println("ERROR: Valid quantity is required");
                 return ResponseEntity.badRequest().body(Map.of("error", "Valid quantity is required"));
             }
-            if (product.getPrice() == null || product.getPrice() <= 0) {
-                System.err.println("ERROR: Valid price is required");
-                return ResponseEntity.badRequest().body(Map.of("error", "Valid price is required"));
+            if (product.getBasePrice() == null || product.getBasePrice() <= 0) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Valid base price is required"));
             }
             
-            // Find farmer and set additional details
+            // Find farmer
             User farmer = userRepository.findByEmail(product.getFarmerEmail()).orElse(null);
             if (farmer != null) {
                 product.setFarmerName(farmer.getFullName());
-                // Only set location if not provided
                 if (product.getLocation() == null || product.getLocation().trim().isEmpty()) {
                     product.setLocation(farmer.getAddress());
                 }
-            } else {
-                System.err.println("WARNING: Farmer not found for email: " + product.getFarmerEmail());
             }
             
-            // Set default values for optional fields
-            if (product.getAvailability() == null) {
-                product.setAvailability("Available");
-            }
-            if (product.getUnit() == null) {
-                product.setUnit("kg");
-            }
-            if (product.getDeliveryDays() == null) {
-                product.setDeliveryDays(7); // Default 7 days
-            }
-            
-            // Set bid end date based on timeframe (default 30 days)
-            if (product.getBidTimeframeDays() == null) {
-                product.setBidTimeframeDays(30);
-            }
-            product.setBidEndDate(LocalDateTime.now().plusDays(product.getBidTimeframeDays()));
-            
-            // Set creation date
+            // Set defaults
+            product.setAvailability("Available");
+            product.setStatus("Active");
+            product.setUnit("kg");
+            product.setDeliveryDays(7);
+            product.setHighestBid(0.0);
+            product.setIsPaused(false);
+            product.setBidTimeframeDays(30);
+            product.setBidEndDate(LocalDateTime.now().plusDays(30));
             product.setCreatedDate(LocalDateTime.now());
             
-            System.out.println("Saving product to database...");
             Product savedProduct = productRepository.save(product);
-            System.out.println("✅ Product saved successfully with ID: " + savedProduct.getId());
-            System.out.println("✅ Product details: " + savedProduct.getName() + ", Qty: " + savedProduct.getQuantity() + ", Price: " + savedProduct.getPrice());
-            
-            // Send email notifications to all retailers in background
-            new Thread(() -> {
-                try {
-                    System.out.println("📧 Sending email notifications to retailers...");
-                    emailService.notifyRetailersNewProduct(savedProduct);
-                    System.out.println("✅ Email notifications completed successfully");
-                } catch (Exception e) {
-                    System.err.println("❌ Email notification failed: " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }).start();
+            System.out.println("✅ Product saved: " + savedProduct.getId());
             
             return ResponseEntity.ok(savedProduct);
         } catch (Exception e) {
-            System.err.println("❌ CRITICAL ERROR adding product: " + e.getMessage());
+            System.err.println("❌ ERROR: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.badRequest().body(Map.of("error", "Failed to add product: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
     
@@ -150,7 +133,7 @@ public class ProductController {
     ) {
         List<Product> products = productRepository.findAll();
         if (category != null) products = productRepository.findByCategory(category);
-        if (minPrice != null && maxPrice != null) products = productRepository.findByPriceBetween(minPrice, maxPrice);
+        if (minPrice != null && maxPrice != null) products = productRepository.findByBasePriceBetween(minPrice, maxPrice);
         if (location != null) products = productRepository.findByLocation(location);
         return ResponseEntity.ok(products);
     }
@@ -160,6 +143,24 @@ public class ProductController {
         Product existing = productRepository.findById(id).orElse(null);
         if (existing == null) return ResponseEntity.badRequest().body(Map.of("message", "Product not found"));
         product.setId(id);
+        return ResponseEntity.ok(productRepository.save(product));
+    }
+    
+    @PutMapping("/{id}/pause")
+    public ResponseEntity<?> pauseProduct(@PathVariable Long id) {
+        Product product = productRepository.findById(id).orElse(null);
+        if (product == null) return ResponseEntity.badRequest().body(Map.of("message", "Product not found"));
+        product.setIsPaused(true);
+        product.setStatus("Paused");
+        return ResponseEntity.ok(productRepository.save(product));
+    }
+    
+    @PutMapping("/{id}/resume")
+    public ResponseEntity<?> resumeProduct(@PathVariable Long id) {
+        Product product = productRepository.findById(id).orElse(null);
+        if (product == null) return ResponseEntity.badRequest().body(Map.of("message", "Product not found"));
+        product.setIsPaused(false);
+        product.setStatus("Active");
         return ResponseEntity.ok(productRepository.save(product));
     }
     

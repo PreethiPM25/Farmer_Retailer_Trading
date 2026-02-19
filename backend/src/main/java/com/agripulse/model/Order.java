@@ -19,13 +19,22 @@ public class Order {
     private String farmerName;
     private String retailerEmail;
     private String retailerName;
-    private String status;
+    private String status; // PENDING_OTP, CONFIRMED, PAID, COMPLETED
+    private String otp;
+    private String paymentMethod;
+    private String transactionId;
     
     @Column(name = "order_date")
     private LocalDateTime orderDate = LocalDateTime.now();
     
     @Column(name = "modified_date")
     private LocalDateTime modifiedDate;
+    
+    @Column(name = "otp_generated_at")
+    private LocalDateTime otpGeneratedAt;
+    
+    @Column(name = "payment_date")
+    private LocalDateTime paymentDate;
     
     public Order() {}
     
@@ -67,4 +76,19 @@ public class Order {
     
     public LocalDateTime getModifiedDate() { return modifiedDate; }
     public void setModifiedDate(LocalDateTime modifiedDate) { this.modifiedDate = modifiedDate; }
+    
+    public String getOtp() { return otp; }
+    public void setOtp(String otp) { this.otp = otp; }
+    
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+    
+    public String getTransactionId() { return transactionId; }
+    public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
+    
+    public LocalDateTime getOtpGeneratedAt() { return otpGeneratedAt; }
+    public void setOtpGeneratedAt(LocalDateTime otpGeneratedAt) { this.otpGeneratedAt = otpGeneratedAt; }
+    
+    public LocalDateTime getPaymentDate() { return paymentDate; }
+    public void setPaymentDate(LocalDateTime paymentDate) { this.paymentDate = paymentDate; }
 }

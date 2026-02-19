@@ -130,7 +130,7 @@ public class EmailService {
                         "Best Regards,\nAgri-Pulse Team",
                         retailer.getFullName(), product.getName(), product.getCategory(),
                         product.getFarmerName(), product.getLocation(), product.getQuantity(),
-                        product.getUnit(), product.getPrice(), product.getDeliveryDays(),
+                        product.getUnit(), product.getBasePrice(), product.getDeliveryDays(),
                         product.getBidTimeframeDays()
                     ));
                     mailSender.send(message);
@@ -145,22 +145,34 @@ public class EmailService {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(farmerEmail);
-            message.setSubject("New Bid Received - " + bid.getProductName());
+            message.setSubject("✅ Order Confirmed - " + bid.getProductName());
             message.setText(String.format(
-                "Dear Farmer,\n\n" +
-                "You have received a new bid:\n\n" +
+                "Dear Murali (Farmer),\n\n" +
+                "🎉 Great news! An order has been officially confirmed by Pavithra (Retailer).\n\n" +
+                "📦 ORDER CONFIRMATION DETAILS:\n" +
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
                 "Product: %s\n" +
                 "Retailer: %s\n" +
-                "Bid Amount: ₹%.2f\n" +
-                "Quantity: %d\n\n" +
-                "Login to view and manage your bids.\n\n" +
-                "Best Regards,\nAgri-Pulse Team",
+                "Confirmed Bid Amount: ₹%.2f\n" +
+                "Quantity: %d units\n" +
+                "Status: ORDER CONFIRMED\n" +
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
+                "📍 IMPORTANT NOTE:\n" +
+                "The order has been officially confirmed by Pavithra (Retailer).\n" +
+                "Please prepare the product for delivery.\n\n" +
+                "Login to your dashboard to view complete order details.\n\n" +
+                "Thank you for using Agri-Pulse!\n\n" +
+                "Best Regards,\n" +
+                "Agri-Pulse Team\n" +
+                "🌾 Connecting Farmers & Retailers",
                 bid.getProductName(), bid.getRetailerName(),
                 bid.getBidAmount(), bid.getQuantity()
             ));
             mailSender.send(message);
+            System.out.println("✅ Order confirmation email sent to farmer: " + farmerEmail);
         } catch (Exception e) {
-            System.err.println("Failed to send bid notification: " + e.getMessage());
+            System.err.println("❌ Failed to send bid notification: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
@@ -203,6 +215,141 @@ public class EmailService {
             mailSender.send(message);
         } catch (Exception e) {
             System.err.println("Failed to send order modification notification: " + e.getMessage());
+        }
+    }
+    
+    public void sendOTPToRetailer(String retailerEmail, Bid bid, String otp) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(retailerEmail);
+            message.setSubject("Order Confirmation OTP - " + bid.getProductName());
+            message.setText(String.format(
+                "Dear %s,\n\n" +
+                "Your bid has been accepted! Please use the following OTP to confirm your order:\n\n" +
+                "Product: %s\n" +
+                "Accepted Bid: ₹%.2f\n" +
+                "OTP: %s\n\n" +
+                "This OTP is valid for 24 hours. Please enter it in the system to confirm your order.\n\n" +
+                "Best Regards,\nAgri-Pulse Team",
+                bid.getRetailerName(), bid.getProductName(), bid.getBidAmount(), otp
+            ));
+            mailSender.send(message);
+        } catch (Exception e) {
+            System.err.println("Failed to send OTP: " + e.getMessage());
+        }
+    }
+    
+    public void sendOrderConfirmationEmail(String retailerEmail, String retailerName, String productName,
+                                          Double bidAmount, String orderStatus) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(retailerEmail);
+            message.setSubject("Order Confirmed - " + productName);
+            message.setText(String.format(
+                "Dear %s,\n\n" +
+                "Your order has been officially confirmed!\n\n" +
+                "Product: %s\n" +
+                "Confirmed Bid Amount: ₹%.2f\n" +
+                "Status: %s\n\n" +
+                "You can track your order and proceed with payment in the dashboard.\n\n" +
+                "Best Regards,\nAgri-Pulse Team",
+                retailerName, productName, bidAmount, orderStatus
+            ));
+            mailSender.send(message);
+        } catch (Exception e) {
+            System.err.println("Failed to send order confirmation email: " + e.getMessage());
+        }
+    }
+    
+    public void sendOrderConfirmationWithDelivery(String retailerEmail, String retailerName, String productName,
+                                                  Double bidAmount, Double quantity, String deliveryDate) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(retailerEmail);
+            message.setSubject("✅ Order Confirmed - " + productName);
+            message.setText(String.format(
+                "Dear %s,\n\n" +
+                "🎉 Congratulations! Your order has been confirmed by the farmer.\n\n" +
+                "📦 ORDER DETAILS:\n" +
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                "Product Name: %s\n" +
+                "Quantity: %.2f units\n" +
+                "Confirmed Bid Amount: ₹%.2f\n" +
+                "Expected Delivery Date: %s\n" +
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
+                "📍 Next Steps:\n" +
+                "1. Prepare for delivery on the specified date\n" +
+                "2. Ensure payment is ready\n" +
+                "3. Track your order in the dashboard\n\n" +
+                "Thank you for using Agri-Pulse!\n\n" +
+                "Best Regards,\n" +
+                "Agri-Pulse Team\n" +
+                "🌾 Connecting Farmers & Retailers",
+                retailerName, productName, quantity, bidAmount, deliveryDate
+            ));
+            mailSender.send(message);
+            System.out.println("✅ Order confirmation email sent to: " + retailerEmail);
+        } catch (Exception e) {
+            System.err.println("Failed to send order confirmation email: " + e.getMessage());
+        }
+    }
+    
+    public void sendPaymentConfirmationEmail(String email, String name, String productName,
+                                            Double amount, String transactionId) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("Payment Successful - " + productName);
+            message.setText(String.format(
+                "Dear %s,\n\n" +
+                "Your payment has been processed successfully!\n\n" +
+                "Product: %s\n" +
+                "Amount: ₹%.2f\n" +
+                "Transaction ID: %s\n\n" +
+                "Thank you for using Agri-Pulse.\n\n" +
+                "Best Regards,\nAgri-Pulse Team",
+                name, productName, amount, transactionId
+            ));
+            mailSender.send(message);
+        } catch (Exception e) {
+            System.err.println("Failed to send payment confirmation email: " + e.getMessage());
+        }
+    }
+    
+    public void sendPaymentCompletionEmail(String email, String name, String productName,
+                                          Double amount, String invoiceNumber, String userType) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("✅ Payment Successful & Invoice Generated - " + productName);
+            
+            String userTypeText = "Farmer".equals(userType) ? "payment has been received" : "payment has been processed";
+            String invoiceText = "Farmer".equals(userType) ? 
+                "The amount will be credited to your account shortly." : 
+                "Please find your invoice attached for your records.";
+            
+            message.setText(String.format(
+                "Dear %s,\n\n" +
+                "🎉 Great news! Your %s successfully!\n\n" +
+                "═══════════════════════════════════════════\n" +
+                "💳 PAYMENT DETAILS\n" +
+                "═══════════════════════════════════════════\n" +
+                "Product Name: %s\n" +
+                "Amount Paid: ₹%.2f\n" +
+                "Invoice Number: %s\n" +
+                "═══════════════════════════════════════════\n\n" +
+                "📋 Invoice Status:\n" +
+                "%s\n\n" +
+                "Thank you for using Agri-Pulse!\n\n" +
+                "Best Regards,\n" +
+                "Agri-Pulse Team\n" +
+                "🌾 Connecting Farmers & Retailers",
+                name, userTypeText, productName, amount, invoiceNumber, invoiceText
+            ));
+            mailSender.send(message);
+            System.out.println("✅ Payment completion email sent to: " + email);
+        } catch (Exception e) {
+            System.err.println("Failed to send payment completion email: " + e.getMessage());
         }
     }
 }

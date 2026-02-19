@@ -6,6 +6,7 @@ import RegistrationPage from './pages/RegistrationPage';
 import AdminDashboard from './pages/AdminDashboard';
 import FarmerDashboard from './pages/FarmerDashboard';
 import RetailerDashboard from './pages/RetailerDashboard';
+import MyBids from './pages/MyBids';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import EmailInboxPage from './pages/EmailInboxPage';
@@ -22,6 +23,7 @@ function App() {
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/farmer/dashboard" element={<FarmerDashboard />} />
         <Route path="/retailer/dashboard" element={<RetailerDashboard />} />
+        <Route path="/my-bids" element={<MyBids />} />
         <Route path="/new-password" element={<ResetPasswordPage />} />
         <Route path="/inbox" element={<EmailInboxPage />} />
         <Route path="/gmail-inbox" element={<EmailInboxSimulator />} />
